@@ -1,0 +1,26 @@
+<div class="post-form">
+  <h1>Edit Post</h1>
+
+  <%= form_for @post do |f| %>
+    <% if @post.errors.any? %>
+      <div class="alert alert-danger">
+        <ul>
+          <% @post.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+    
+    <div class="form-group">
+      <%= f.label :content %>
+      <%= f.text_area :content, class: 'form-control', rows: 5 %>
+    </div>
+    
+    <div class="form-actions">
+      <%= f.submit "Update Post", class: 'btn btn-primary' %>
+      <%= link_to 'Back', post_path(@post), class: 'btn btn-secondary' %>
+      <%= link_to 'Cancel', posts_path, class: 'btn btn-secondary' %>
+    </div>
+  <% end %>
+</div>
