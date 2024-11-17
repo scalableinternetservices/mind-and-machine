@@ -4,6 +4,10 @@
 ARG RUBY_VERSION=3.2.2
 FROM ruby:$RUBY_VERSION
 
+RUN echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99custom && \
+        echo "Acquire::http::No-Cache true;" >> /etc/apt/apt.conf.d/99custom && \
+        echo "Acquire::BrokenProxy    true;" >> /etc/apt/apt.conf.d/99custom
+
 # throw errors if Gemfile has been modified since Gemfile.lock
 RUN bundle config --global frozen 1
 
