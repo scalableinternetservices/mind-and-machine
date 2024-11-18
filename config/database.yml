@@ -83,6 +83,8 @@ test:
 #
 production:
   <<: *default
-  database: mind_and_machine_production
-  username: mind_and_machine
-  password: <%= ENV["MIND_AND_MACHINE_DATABASE_PASSWORD"] %>
+  database: <%= ENV['RDS_DB_NAME'] %>
+  host: <%= ENV['RDS_HOSTNAME'] %>
+  username: <%= ENV['RDS_USERNAME'] %>
+  password: <%= ENV['RDS_PASSWORD'] %>
+  port: <%= ENV['RDS_PORT'] %>
