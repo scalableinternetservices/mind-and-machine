@@ -1,0 +1,58 @@
+<div class="post-detail">
+  <div class="post-card">
+    <div class="post-content">
+      <%= @post.content %>
+    </div>
+    <div class="post-meta">
+      <span>By: <%= @post.user.username %></span>
+      <span>Last updated: <%= time_ago_in_words(@post.updated_at) %> ago</span>
+    </div>
+    <% if @post.user == current_user %>
+      <div class="post-actions">
+        <%= link_to 'Edit', edit_post_path(@post), class: 'btn btn-secondary' %>
+        <%= button_to 'Delete', post_path(@post), 
+          method: :delete, 
+          data: { confirm: 'Are you sure?' }, 
+          class: 'btn btn-danger' %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="comments-section">
+    <h3>Comments (<%= @post.comments.count %>)</h3>
+    
+    <div class="comments-list">
+      <% @post.comments.each do |comment| %>
+        <div class="comment">
+          <p><%= comment.content %></p>
+          <small>By: <%= comment.user.username %></small>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="comment-form">
+      <h4>Add Comment</h4>
+      <%= form_for [@post, @comment] do |f| %>
+        <% if @comment.errors.any? %>
+          <div class="alert alert-danger">
+            <ul>
+              <% @comment.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+        
+        <div class="form-group">
+          <%= f.text_area :content, class: 'form-control', rows: 3, placeholder: 'Write your comment here...' %>
+        </div>
+        
+        <%= f.submit "Add Comment", class: 'btn btn-primary' %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="navigation">
+    <%= link_to 'Back to Posts', posts_path, class: 'btn btn-secondary' %>
+  </div>
+</div>

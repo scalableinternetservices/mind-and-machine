@@ -1,0 +1,36 @@
+<div class="posts-container">
+  <h1>Posts</h1>
+
+  <div class="actions">
+    <%= link_to 'New Post', new_post_path, class: 'btn btn-primary' %>
+    
+    <%= form_tag root_path, method: :get, class: 'filter-form' do %>
+      <%= text_field_tag :username, params[:username], placeholder: "Filter by username", class: 'form-control' %>
+      <%= submit_tag "Filter", class: 'btn btn-secondary' %>
+    <% end %>
+  </div>
+
+  <div id="posts">
+    <% @posts.each do |post| %>
+      <div class="post-card">
+        <div class="post-content">
+          <%= post.content %>
+        </div>
+        <div class="post-meta">
+          <span>By: <%= post.user.username %></span>
+          <span><%= link_to "Comments (#{post.comments.count})", post_path(post) %></span>
+          <span>Last updated: <%= time_ago_in_words(post.updated_at) %> ago</span>
+        </div>
+        <% if post.user == current_user %>
+          <div class="post-actions">
+            <%= link_to 'Edit', edit_post_path(post), class: 'btn btn-sm btn-secondary' %>
+            <%= button_to 'Delete', post_path(post), 
+              method: :delete, 
+              data: { confirm: 'Are you sure?' }, 
+              class: 'btn btn-sm btn-danger' %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
