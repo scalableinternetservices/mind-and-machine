@@ -16,8 +16,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_01_200748) do
 
   create_table "comments", force: :cascade do |t|
     t.text "content"
-    t.integer "user_id", null: false
-    t.integer "post_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "post_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["post_id"], name: "index_comments_on_post_id"
@@ -26,7 +26,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_01_200748) do
 
   create_table "posts", force: :cascade do |t|
     t.text "content"
-    t.integer "user_id", null: false
+    t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_posts_on_user_id"
