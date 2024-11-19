@@ -4,16 +4,16 @@
       <%= @post.content %>
     </div>
     <div class="post-meta">
-      <span>By: <%= @post.user.username %></span>
+      <span>By: <%= @post.user ? @post.user.username : "Anonymous" %></span>
       <span>Last updated: <%= time_ago_in_words(@post.updated_at) %> ago</span>
     </div>
-    <% if @post.user == current_user %>
+    <% if current_user && @post.user == current_user %>
       <div class="post-actions">
         <%= link_to 'Edit', edit_post_path(@post), class: 'btn btn-secondary' %>
         <%= button_to 'Delete', post_path(@post), 
-          method: :delete, 
-          data: { confirm: 'Are you sure?' }, 
-          class: 'btn btn-danger' %>
+            method: :delete, 
+            data: { confirm: 'Are you sure?' }, 
+            class: 'btn btn-danger' %>
       </div>
     <% end %>
   </div>
@@ -25,7 +25,16 @@
       <% @post.comments.each do |comment| %>
         <div class="comment">
           <p><%= comment.content %></p>
-          <small>By: <%= comment.user.username %></small>
+          <small>By: <%= comment.user ? comment.user.username : "Anonymous" %></small>
+          <% if current_user && comment.user == current_user %>
+            <div class="comment-actions">
+              <%= link_to 'Edit', edit_post_comment_path(@post, comment), class: 'btn btn-sm btn-secondary' %>
+              <%= button_to 'Delete', post_comment_path(@post, comment), 
+                  method: :delete, 
+                  data: { confirm: 'Are you sure?' }, 
+                  class: 'btn btn-sm btn-danger' %>
+            </div>
+          <% end %>
         </div>
       <% end %>
     </div>
