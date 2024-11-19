@@ -78,7 +78,24 @@ GEM
       mutex_m
       securerandom (>= 0.3)
       tzinfo (~> 2.0)
+    aws-eventstream (1.3.0)
+    aws-partitions (1.1009.0)
+    aws-sdk-core (3.213.0)
+      aws-eventstream (~> 1, >= 1.3.0)
+      aws-partitions (~> 1, >= 1.992.0)
+      aws-sigv4 (~> 1.9)
+      jmespath (~> 1, >= 1.6.1)
+    aws-sdk-kms (1.96.0)
+      aws-sdk-core (~> 3, >= 3.210.0)
+      aws-sigv4 (~> 1.5)
+    aws-sdk-s3 (1.172.0)
+      aws-sdk-core (~> 3, >= 3.210.0)
+      aws-sdk-kms (~> 1)
+      aws-sigv4 (~> 1.5)
+    aws-sigv4 (1.10.1)
+      aws-eventstream (~> 1, >= 1.0.2)
     base64 (0.2.0)
+    bcrypt (3.1.20)
     benchmark (0.4.0)
     bigdecimal (3.1.8)
     bindex (0.8.1)
@@ -106,6 +123,9 @@ GEM
     irb (1.14.1)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
+    jmespath (1.6.2)
+    jwt (2.9.3)
+      base64
     logger (1.6.1)
     loofah (2.23.1)
       crass (~> 1.0.2)
@@ -134,13 +154,15 @@ GEM
       racc (~> 1.4)
     nokogiri (1.16.7-x86_64-linux)
       racc (~> 1.4)
-    pg (1.1.4)
+    pg (1.3.5)
     psych (5.2.0)
       stringio
     puma (6.4.3)
       nio4r (~> 2.0)
     racc (1.8.1)
     rack (3.1.8)
+    rack-cors (2.0.2)
+      rack (>= 2.0.0)
     rack-session (2.0.0)
       rack (>= 3.0.0)
     rack-test (2.1.0)
@@ -214,11 +236,15 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  aws-sdk-s3 (~> 1.0)
+  bcrypt (~> 3.1.7)
   bootsnap
   debug
   importmap-rails
-  pg (~> 1.1.0)
+  jwt
+  pg (~> 1.3.0)
   puma (>= 5.0)
+  rack-cors
   rails (~> 7.1.2)
   sprockets-rails
   stimulus-rails
