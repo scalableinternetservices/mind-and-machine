@@ -17,17 +17,17 @@
           <%= post.content %>
         </div>
         <div class="post-meta">
-          <span>By: <%= post.user.username %></span>
+          <span>By: <%= post.user ? post.user.username : "Anonymous" %></span>
           <span><%= link_to "Comments (#{post.comments.count})", post_path(post) %></span>
           <span>Last updated: <%= time_ago_in_words(post.updated_at) %> ago</span>
         </div>
-        <% if post.user == current_user %>
+        <% if current_user && post.user == current_user %>
           <div class="post-actions">
             <%= link_to 'Edit', edit_post_path(post), class: 'btn btn-sm btn-secondary' %>
             <%= button_to 'Delete', post_path(post), 
-              method: :delete, 
-              data: { confirm: 'Are you sure?' }, 
-              class: 'btn btn-sm btn-danger' %>
+                method: :delete, 
+                data: { confirm: 'Are you sure?' }, 
+                class: 'btn btn-sm btn-danger' %>
           </div>
         <% end %>
       </div>

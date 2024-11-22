@@ -1,5 +1,5 @@
 class Post < ApplicationRecord
-  belongs_to :user
+  belongs_to :user, optional: true  # Added optional
   has_many :comments, dependent: :destroy
   
   validates :content, presence: true
