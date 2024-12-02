@@ -5,6 +5,20 @@ class Post < ApplicationRecord
   validates :content, presence: true
   validate :no_election_influence
   
+  def like_by(user_id)
+    unless self.likes.include?(user_id)
+      self.likes << user_id
+      self.save
+    end
+  end
+
+  def unlike_by(user_id)
+    if self.likes.include?(user_id)
+      self.likes.delete(user_id)
+      self.save
+    end
+  end
+  
   private
   
   def no_election_influence

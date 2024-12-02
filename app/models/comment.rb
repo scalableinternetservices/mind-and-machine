@@ -13,4 +13,7 @@ class Comment < ApplicationRecord
       errors.add(:content, "cannot contain election-related content")
     end
   end
+
+  validates :user_id, presence: true
+  validates :post_id, presence: true
 end
