@@ -1,4 +1,4 @@
-# Mind and Machine Social Platform
+# Tweet - Final Proj for TEAM [Mind and Machine]
 
 A modern social networking platform built with Ruby on Rails and Next.js, featuring real-time messaging, post sharing, and user interactions.
 
