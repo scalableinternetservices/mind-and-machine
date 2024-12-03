@@ -76,3 +76,7 @@ The frontend communicates with a Ruby on Rails backend API running on `http://lo
 - Likes: `/api/posts/:id/like`
 - Search: `/api/search/posts`, `/api/search/users`
 - Messages: `/api/chats`
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
