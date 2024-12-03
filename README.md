@@ -1,6 +1,10 @@
-# Tweet - Final Proj for TEAM [Mind and Machine]
+# Tweet - Final Project for Team Mind-and-Machine
 
-A modern social networking platform built with Ruby on Rails and Next.js, featuring real-time messaging, post sharing, and user interactions.
+**Tweet** - a modern social networking platform built with Ruby on Rails and Next.js, featuring real-time messaging, post sharing, and user interactions.
+
+<img width="1624" alt="Screenshot 2024-12-02 at 6 03 49 PM" src="https://github.com/user-attachments/assets/b8ea80b0-9ed6-4de8-aa4b-244766bbe698">
+
+<img width="1624" alt="Screenshot 2024-12-02 at 6 03 58 PM" src="https://github.com/user-attachments/assets/d7cffa7a-353c-4192-8bde-3850be33dbe7">
 
 ## Tech Stack
 
@@ -42,6 +46,7 @@ make run
 ```
 
 ## Project Structure
+```bash
 mind-and-machine/
 ├── Dockerfile
 ├── Gemfile
@@ -57,6 +62,7 @@ mind-and-machine/
 ├── react (frontend Next.js app)
 ├── storage
 └── vendor
+```
 
 ## API Endpoints
 
