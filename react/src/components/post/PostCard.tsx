@@ -32,10 +32,12 @@ const PostCard = ({ post, onUpdate, onDelete, currentUserId }: PostCardProps) =>
     try {
       if (!likedUserIds.includes(currentUserId)) {
         const data = await postService.likePost(post.id);
+        data.likes = data.likes.map(like => parseInt(like));
         setLikedUserIds(data.likes);
         onUpdate?.({...post, likes: data.likes});
       } else {
         const data = await postService.unlikePost(post.id);
+        data.likes = data.likes.map(like => parseInt(like));
         setLikedUserIds(data.likes);
         onUpdate?.({...post, likes: data.likes});
       }

@@ -18,7 +18,6 @@ const HomePage = () => {
   const fetchPosts = async () => {
     try {
       const data = await postService.getPosts();
-      console.log('Posts data:', data);
       setPosts(data);
     } catch (err: unknown) {
       if (err instanceof AxiosError) {

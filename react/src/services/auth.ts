@@ -28,6 +28,8 @@ export const authService = {
       if (response.data.user && response.data.user.id) {
         localStorage.setItem('userId', response.data.user.id);
         localStorage.setItem('username', response.data.user.username);
+        localStorage.setItem('joined_at', response.data.user.created_at);
+        console.log('joined_at', response.data.user.created_at);
       }
 
       return response.data;
@@ -52,6 +54,7 @@ export const authService = {
   logout() {
     localStorage.removeItem('userId');
     localStorage.removeItem('username');
+    localStorage.removeItem('joined_at');
   },
 
   getCurrentUser() {

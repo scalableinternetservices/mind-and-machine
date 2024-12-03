@@ -35,6 +35,14 @@
 /config/master.key
 
 node_modules/
+.next/
+.vercel/
+build/
+
+npm-cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 .DS_Store
 

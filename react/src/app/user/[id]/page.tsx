@@ -23,8 +23,12 @@ const UserProfilePage = () => {
   const [joinedDate, setJoinedDate] = useState<string | null>(null);
 
   useEffect(() => {
-    const currentId = localStorage.getItem('userId');
+    const currentId = parseInt(localStorage.getItem('userId') || '0');
     setCurrentUserId(currentId);
+    const cuurentUserName = localStorage.getItem('username');
+    setUsername(cuurentUserName);
+    const joinedAt = localStorage.getItem('joined_at');
+    setJoinedDate(joinedAt);
 
     if (id) {
       fetchUserData(id as number);
@@ -38,12 +42,19 @@ const UserProfilePage = () => {
         postService.getUserPosts(userId),
         postService.getLikedPosts(userId)
       ]);
-      setUserPosts(posts);
-      setLikedPosts(liked);
-      if (posts.length > 0) {
-        setUsername(posts[0].user.username);
-        setJoinedDate(posts[0].user.created_at);
-      }
+      
+      const postsWithIntLikes = posts.map(post => ({
+        ...post,
+        likes: post.likes.map(like => parseInt(like))
+      }));
+      
+      const likedWithIntLikes = liked.map(post => ({
+        ...post,
+        likes: post.likes.map(like => parseInt(like))
+      }));
+
+      setUserPosts(postsWithIntLikes);
+      setLikedPosts(likedWithIntLikes);
     } catch (err: any) {
       setError('Failed to fetch user data');
       console.error('Error fetching user data:', err);
@@ -84,7 +95,7 @@ const UserProfilePage = () => {
             <UserCircleIcon className="w-20 h-20 text-gray-400" />
             <div>
               <h1 className="text-2xl font-bold">{username}</h1>
-              {joinedDate && (
+              {joinedDate && !isNaN(new Date(joinedDate).getTime()) && (
                 <div className="flex items-center text-gray-500 mt-2">
                   <CalendarIcon className="w-5 h-5 mr-2" />
                   <span>
