@@ -6,6 +6,8 @@
 
 <img width="1624" alt="Screenshot 2024-12-02 at 6 03 58 PM" src="https://github.com/user-attachments/assets/d7cffa7a-353c-4192-8bde-3850be33dbe7">
 
+<img width="1624" alt="Screenshot 2024-12-02 at 6 09 04 PM" src="https://github.com/user-attachments/assets/971e4bae-69c3-4a7e-9b96-bdf391ecae8d">
+
 ## Tech Stack
 
 ### Backend
