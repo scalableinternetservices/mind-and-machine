@@ -94,4 +94,10 @@ Rails.application.configure do
   # ]
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+
+  # allow all hosts
+  config.hosts.clear
+
+  # ensure CORS middleware is enabled in production
+  config.middleware.use Rack::Cors
 end

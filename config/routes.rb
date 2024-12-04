@@ -29,4 +29,6 @@ Rails.application.routes.draw do
     # get potential chat members route
     get '/users/potential_chat_members', to: 'users#potential_chat_members'
   end
+
+  root to: proc { [200, {}, ['Mind and Machine API Server']] }
 end
