@@ -1,6 +1,7 @@
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins '*'
+    origins 'http://localhost:8000',
+            /\Ahttp:\/\/.*\.elasticbeanstalk\.com\z/
 
     resource '*',
       headers: :any,
