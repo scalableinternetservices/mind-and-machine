@@ -1,12 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { authService } from '@/services/auth';
-import { AxiosError } from 'axios';
+import Link from 'next/link';
 
-const LoginPage = () => {
+export default function LoginPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     username: '',
@@ -83,6 +82,4 @@ const LoginPage = () => {
       </div>
     </div>
   );
-};
-
-export default LoginPage; 
+} 
