@@ -1,35 +1,49 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { authService } from '@/services/auth';
+import Link from 'next/link';
+import { AuthError, USERNAME_REGEX, USERNAME_RULES } from '@/types/auth';
 
-const RegisterPage = () => {
+export default function RegisterPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     username: '',
     password: '',
-    password_confirmation: '',
+    password_confirmation: ''
   });
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState<AuthError>({});
   const [isLoading, setIsLoading] = useState(false);
+
+  const validateUsername = (username: string): boolean => {
+    if (!USERNAME_REGEX.test(username)) {
+      setErrors(prev => ({
+        ...prev,
+        username: [USERNAME_RULES]
+      }));
+      return false;
+    }
+    return true;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-
-    if (formData.password !== formData.password_confirmation) {
-      setError('Passwords do not match');
+    setErrors({});
+    
+    if (!validateUsername(formData.username)) {
       return;
     }
 
     setIsLoading(true);
+
     try {
       await authService.register(formData);
       router.push('/login');
     } catch (err: any) {
-      setError(err.message || 'Registration failed. Please try again.');
+      setErrors(err.response?.data?.errors || {
+        general: ['Registration failed. Please try again.']
+      });
     } finally {
       setIsLoading(false);
     }
@@ -40,25 +54,27 @@ const RegisterPage = () => {
       <div className="bg-gray-900 p-8 rounded-lg w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-blue-500">Tweet</h1>
-          <p className="text-gray-500 mt-2">Join the conversation</p>
+          <p className="text-gray-500 mt-2">Create your account</p>
         </div>
 
-        <h2 className="text-2xl font-bold text-white mb-6 text-center">Register</h2>
-        {error && (
-          <div className="bg-red-500/10 border border-red-500 text-red-500 rounded-lg p-3 mb-4">
-            {error}
-          </div>
-        )}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-gray-300 mb-2">Username</label>
             <input
               type="text"
               value={formData.username}
-              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-              className="w-full bg-gray-800 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => {
+                setFormData({ ...formData, username: e.target.value });
+                setErrors(prev => ({ ...prev, username: undefined }));
+              }}
+              className={`w-full bg-gray-800 text-white rounded-lg p-3 focus:outline-none focus:ring-2 ${
+                errors.username ? 'border-red-500 focus:ring-red-500' : 'focus:ring-blue-500'
+              }`}
               required
             />
+            {errors.username && (
+              <p className="text-red-500 text-sm mt-1">{errors.username[0]}</p>
+            )}
           </div>
           <div>
             <label className="block text-gray-300 mb-2">Password</label>
@@ -97,6 +113,4 @@ const RegisterPage = () => {
       </div>
     </div>
   );
-};
-
-export default RegisterPage; 
+} 

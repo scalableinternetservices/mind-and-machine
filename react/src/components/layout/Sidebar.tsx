@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { HomeIcon, ChatBubbleLeftIcon, UserIcon, ArrowLeftOnRectangleIcon } from '@heroicons/react/24/outline';
+import { HomeIcon, ChatBubbleLeftIcon, UserIcon, ArrowLeftOnRectangleIcon, UserPlusIcon } from '@heroicons/react/24/outline';
 import { authService } from '@/services/auth';
 import { useEffect, useState } from 'react';
 
@@ -8,18 +8,24 @@ const Sidebar = () => {
   const router = useRouter();
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [username, setUsername] = useState<string | null>(null);
+  const [isGuest, setIsGuest] = useState(true);
 
   useEffect(() => {
+    const username = localStorage.getItem('username');
     const userId = parseInt(localStorage.getItem('userId') || '0');
     const storedUsername = localStorage.getItem('username');
+    
+    setIsGuest(!username);
     setCurrentUserId(userId);
     setUsername(storedUsername);
   }, []);
 
   const menuItems = [
     { icon: HomeIcon, label: 'Home', href: '/home' },
-    { icon: ChatBubbleLeftIcon, label: 'Message', href: '/message' },
-    { icon: UserIcon, label: 'Profile', href: `/user/${currentUserId}` },
+    ...(isGuest ? [] : [
+      { icon: ChatBubbleLeftIcon, label: 'Message', href: '/message' },
+      { icon: UserIcon, label: 'Profile', href: `/user/${currentUserId}` },
+    ]),
   ];
 
   const handleLogout = () => {
@@ -50,21 +56,40 @@ const Sidebar = () => {
         ))}
       </div>
       
-      {/* User info and logout section */}
+      {/* User info and auth section */}
       <div className="border-t border-gray-800 pt-4 mt-2">
-        {username && (
-          <div className="px-3 py-2 text-gray-300">
-            <span className="text-l">Signed in as</span>
-            <div className="font-bold text-xl">{username}</div>
+        {isGuest ? (
+          <div className="space-y-2">
+            <Link
+              href="/login"
+              className="flex items-center space-x-4 p-3 hover:bg-gray-900 rounded-full transition text-blue-500 hover:text-blue-400 w-full"
+            >
+              <UserIcon className="h-6 w-6" />
+              <span className="text-xl">Login</span>
+            </Link>
+            <Link
+              href="/register"
+              className="flex items-center space-x-4 p-3 hover:bg-gray-900 rounded-full transition text-green-500 hover:text-green-400 w-full"
+            >
+              <UserPlusIcon className="h-6 w-6" />
+              <span className="text-xl">Register</span>
+            </Link>
           </div>
+        ) : (
+          <>
+            <div className="px-3 py-2 text-gray-300">
+              <span className="text-l">Signed in as</span>
+              <div className="font-bold text-xl">{username}</div>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="flex items-center space-x-4 p-3 hover:bg-gray-900 rounded-full transition text-red-500 hover:text-red-600 w-full mt-2"
+            >
+              <ArrowLeftOnRectangleIcon className="h-6 w-6" />
+              <span className="text-xl">Logout</span>
+            </button>
+          </>
         )}
-        <button
-          onClick={handleLogout}
-          className="flex items-center space-x-4 p-3 hover:bg-gray-900 rounded-full transition text-red-500 hover:text-red-600 w-full mt-2"
-        >
-          <ArrowLeftOnRectangleIcon className="h-6 w-6" />
-          <span className="text-xl">Logout</span>
-        </button>
       </div>
     </div>
   );

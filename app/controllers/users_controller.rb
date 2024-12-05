@@ -9,7 +9,6 @@ class UsersController < ApplicationController
   def create   
     @user = User.new(user_params)
     if @user.save
-      session[:user_id] = @user.id
       render json: {
         message: "signup success",
         user: { id: @user.id, username: @user.username }
@@ -28,7 +27,7 @@ class UsersController < ApplicationController
       return
     end
     
-    @users = User.where("username ILIKE ?", "%#{query}%")
+    @users = User.where("username ILIKE ? AND is_guest = ?", "%#{query}%", false)
                  .order(created_at: :desc)
     
     render json: @users.map { |user|
@@ -42,8 +41,9 @@ class UsersController < ApplicationController
 
   # get potential chat members except current user
   def potential_chat_members
-    @users = User.where.not(id: current_user.id)
-                 .order(username: :asc)
+    @users = User.where(is_guest: false)
+                 .where.not(id: current_user.id)
+                 .order(created_at: :desc)
     
     render json: @users.map { |user|
       {

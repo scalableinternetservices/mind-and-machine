@@ -38,12 +38,6 @@ const PostDetailPage = () => {
   };
 
   useEffect(() => {
-    if (!authService.isAuthenticated()) {
-      router.push('/login');
-    }
-  }, [router]);
-
-  useEffect(() => {
     if (id) {
       fetchPost();
     }

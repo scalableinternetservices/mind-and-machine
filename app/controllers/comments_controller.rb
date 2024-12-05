@@ -1,13 +1,17 @@
 class CommentsController < ApplicationController
-  before_action :require_login
+  before_action :require_login, only: [:update, :destroy]
   before_action :set_post
   before_action :set_comment, only: [:update, :destroy]
   before_action :check_ownership, only: [:update, :destroy]
 
   def create
-    @comment = @post.comments.build(comment_params)
-    @comment.user = current_user
-    
+    @comment = if current_user
+                @post.comments.build(comment_params.merge(user: current_user))
+              else
+                guest_user = User.guest
+                @post.comments.build(comment_params.merge(user: guest_user))
+              end
+
     if @comment.save
       render json: {
         id: @comment.id,
@@ -15,7 +19,8 @@ class CommentsController < ApplicationController
         created_at: @comment.created_at,
         user: {
           id: @comment.user.id,
-          username: @comment.user.username
+          username: @comment.user.username,
+          is_guest: @comment.user.is_guest?
         }
       }, status: :created
     else

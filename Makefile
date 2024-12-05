@@ -7,7 +7,7 @@ build:
 
 start:
 	docker compose up --detach db --remove-orphans
-	docker compose run web rails db:create db:migrate
+	docker compose run web rails db:create db:migrate guest:create guest:ensure
 	docker compose up
 
 # run docker-compose

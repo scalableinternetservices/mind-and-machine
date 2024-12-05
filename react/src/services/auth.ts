@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { LoginCredentials, RegisterCredentials, AuthResponse } from '@/types/auth';
+import { useRouter } from 'next/navigation';
 
 const API_URL = 'http://localhost:3000';
 
@@ -51,10 +52,16 @@ export const authService = {
     }
   },
 
-  logout() {
-    localStorage.removeItem('userId');
-    localStorage.removeItem('username');
-    localStorage.removeItem('joined_at');
+  async logout() {
+    try {
+      localStorage.removeItem('userId');
+      localStorage.removeItem('username');
+      localStorage.removeItem('joined_at');
+      const response = await axios.delete(`${API_URL}/api/logout`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Logout failed');
+    }
   },
 
   getCurrentUser() {

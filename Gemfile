@@ -6,8 +6,6 @@ gem 'aws-sdk-s3', '~> 1.0'
 
 gem "bcrypt", "~> 3.1.7"
 
-gem "rack-cors"
-
 gem "jwt"
 
 gem "rails", "~> 7.1.2"

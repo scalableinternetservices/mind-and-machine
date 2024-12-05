@@ -33,6 +33,8 @@ const CommentList = ({
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
   const [editContent, setEditContent] = useState('');
 
+  const isGuestPost = localStorage.getItem('username') === null;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim() || isSubmitting) return;
@@ -138,7 +140,7 @@ const CommentList = ({
                       })}
                     </span>
                   </div>
-                  {currentUserId && currentUserId === comment.user.id && (
+                  { !isGuestPost && currentUserId === comment.user.id && (
                     <div className="flex items-center space-x-2">
                       {editingCommentId !== comment.id && (
                         <>

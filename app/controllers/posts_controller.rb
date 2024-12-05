@@ -1,5 +1,5 @@
 class PostsController < ApplicationController
-  before_action :require_login, only: [:create, :update, :destroy, :like, :unlike]
+  before_action :require_login, only: [:update, :destroy, :like, :unlike]
   before_action :set_post, only: [:show, :update, :destroy, :like, :unlike]
   before_action :check_ownership, only: [:update, :destroy]
   
@@ -12,7 +12,8 @@ class PostsController < ApplicationController
         created_at: post.created_at,
         user: {
           id: post.user&.id,
-          username: post.user&.username
+          username: post.user&.username,
+          is_guest: post.user&.is_guest?
         },
         likes: post.likes.map(&:to_s),
         comments: post.comments.map { |comment|
@@ -60,7 +61,13 @@ class PostsController < ApplicationController
   end
 
   def create
-    @post = current_user.posts.build(post_params)
+    @post = if current_user
+              current_user.posts.build(post_params)
+            else
+              guest_user = User.guest
+              guest_user.posts.build(post_params)
+            end
+
     @post.likes = []
     
     if @post.save
@@ -70,7 +77,8 @@ class PostsController < ApplicationController
         created_at: @post.created_at,
         user: {
           id: @post.user.id,
-          username: @post.user.username
+          username: @post.user.username,
+          is_guest: @post.user.is_guest?
         },
         likes: @post.likes.map(&:to_s),
         comments: []

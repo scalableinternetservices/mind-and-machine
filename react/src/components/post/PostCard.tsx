@@ -18,12 +18,20 @@ interface PostCardProps {
   currentUserId?: number | null;
 }
 
+interface PostUser {
+  id: number;
+  username: string;
+  is_guest?: boolean;
+}
+
 const PostCard = ({ post, onUpdate, onDelete, currentUserId }: PostCardProps) => {
   const [likedUserIds, setLikedUserIds] = useState(post.likes);
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content);
   const [error, setError] = useState('');
+
+  const isGuestPost = localStorage.getItem('username') === null;
 
   const handleLikeClick = async () => {
     if (isLoading || !currentUserId) return;
@@ -92,15 +100,19 @@ const PostCard = ({ post, onUpdate, onDelete, currentUserId }: PostCardProps) =>
         <div className="flex-1">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Link href={`/user/${post.user.id}`}>
-                <span className="font-bold hover:underline">{post.user.username}</span>
-              </Link>
+              {isGuestPost ? (
+                <span className="text-gray-500">{post.user.username}</span>
+              ) : (
+                <Link href={`/user/${post.user.id}`}>
+                  <span className="font-bold hover:underline">{post.user.username}</span>
+                </Link>
+              )}
               <span className="text-gray-500">·</span>
               <span className="text-gray-500">
                 {formatDistanceToNow(new Date(post.created_at), { locale: enUS, addSuffix: true })}
               </span>
             </div>
-            {currentUserId && currentUserId === post.user.id && (
+            {!isGuestPost && post.user?.id === currentUserId && (
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => setIsEditing(true)}
@@ -157,20 +169,22 @@ const PostCard = ({ post, onUpdate, onDelete, currentUserId }: PostCardProps) =>
               <ChatBubbleLeftIcon className="w-5 h-5 group-hover:bg-blue-400/10 rounded-full p-0.5" />
               <span>{post.comments.length}</span>
             </Link>
-            <button
-              onClick={handleLikeClick}
-              disabled={isLoading || !currentUserId}
-              className={`flex items-center space-x-2 group ${
-                likedUserIds.includes(currentUserId || 0) ? 'text-pink-600' : 'hover:text-pink-600'
-              }`}
-            >
-              {likedUserIds.includes(currentUserId || 0) ? (
-                <HeartSolid className="w-5 h-5 group-hover:bg-pink-600/10 rounded-full p-0.5" />
-              ) : (
-                <HeartOutline className="w-5 h-5 group-hover:bg-pink-600/10 rounded-full p-0.5" />
-              )}
-              <span>{likedUserIds.length}</span>
-            </button>
+            { !isGuestPost && (
+              <button
+                onClick={handleLikeClick}
+                disabled={isLoading || !currentUserId}
+                className={`flex items-center space-x-2 group ${
+                  likedUserIds.includes(currentUserId) ? 'text-pink-600' : 'hover:text-pink-600'
+                }`}
+              >
+                {likedUserIds.includes(currentUserId) ? (
+                  <HeartSolid className="w-5 h-5 group-hover:bg-pink-600/10 rounded-full p-0.5" />
+                ) : (
+                  <HeartOutline className="w-5 h-5 group-hover:bg-pink-600/10 rounded-full p-0.5" />
+                )}
+                <span>{likedUserIds.length}</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
