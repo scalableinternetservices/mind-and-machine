@@ -4,7 +4,7 @@ class ChatRoomsController < ApplicationController
   before_action :check_membership, only: [:show]
 
   def index
-    @chat_rooms = current_user.chat_rooms.includes(:members, chat_messages: :user)
+    @chat_rooms = current_user.chat_rooms.all
     
     render json: @chat_rooms.map { |room|
       {

@@ -29,7 +29,7 @@ class CommentsController < ApplicationController
   end
 
   def post_comments
-    @comments = Comment.includes(:user)
+    @comments = Comment.all
                        .where(post_id: params[:post_id])
                        .order(created_at: :desc)
     render json: @comments.map { |comment|

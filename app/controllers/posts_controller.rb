@@ -4,7 +4,7 @@ class PostsController < ApplicationController
   before_action :check_ownership, only: [:update, :destroy]
   
   def index
-    @posts = Post.includes(:user, :comments).order(created_at: :desc)
+    @posts = Post.all.order(created_at: :desc)
     render json: @posts.map { |post| 
       {
         id: post.id,
@@ -27,7 +27,7 @@ class PostsController < ApplicationController
   end
 
   def show
-    @post = Post.includes(:user, :comments => :user).find(params[:id])
+    @post = Post.all.find(params[:id])
     render json: {
       id: @post.id,
       content: @post.content,
@@ -119,7 +119,7 @@ class PostsController < ApplicationController
       return
     end
     
-    @posts = Post.includes(:user, :comments)
+    @posts = Post.all
                  .where(user_id: @user.id)
                  .order(created_at: :desc)
     
@@ -154,7 +154,7 @@ class PostsController < ApplicationController
       return
     end
     
-    @posts = Post.includes(:user, :comments)
+    @posts = Post.all
                  .where("likes @> ARRAY[?]::integer[]", [@user.id])
                  .order(created_at: :desc)
     
@@ -187,7 +187,7 @@ class PostsController < ApplicationController
       return
     end
     
-    @posts = Post.includes(:user, :comments)
+    @posts = Post.all
                  .where("content ILIKE ?", "%#{query}%")
                  .order(created_at: :desc)
     
