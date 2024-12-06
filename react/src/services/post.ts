@@ -148,6 +148,18 @@ export const postService = {
     }
   },
 
+  async getPostComments(postId: number): Promise<Comment[]> {
+    try {
+      const response = await axios.get(`${API_URL}/api/posts/${postId}/comments`);
+      return response.data;
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        throw new Error(error.response?.data?.message || 'Failed to fetch post comments');
+      }
+      throw error;
+    }
+  },
+
   async getLikedPosts(userId: number): Promise<Post[]> {
     try {
       const response = await axios.get(`${API_URL}/api/user/${userId}/liked_posts`);

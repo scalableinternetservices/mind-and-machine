@@ -28,6 +28,23 @@ class CommentsController < ApplicationController
     end
   end
 
+  def post_comments
+    @comments = Comment.includes(:user)
+                       .where(post_id: params[:post_id])
+                       .order(created_at: :desc)
+    render json: @comments.map { |comment|
+      {
+        id: comment.id,
+        content: comment.content,
+        created_at: comment.created_at,
+        user: {
+          id: comment.user.id,
+          username: comment.user.username
+        }
+      }
+    }
+  end
+
   def update
     if @comment.update(comment_params)
       render json: {
