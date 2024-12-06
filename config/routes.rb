@@ -12,6 +12,7 @@ Rails.application.routes.draw do
     # user posts routes
     get '/user/:user_id/posts', to: 'posts#user_posts'
     get '/user/:user_id/liked_posts', to: 'posts#liked_posts'
+    get '/posts/:post_id/comments', to: 'comments#post_comments'
     
     resources :posts do
       member do

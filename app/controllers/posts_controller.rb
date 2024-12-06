@@ -12,19 +12,14 @@ class PostsController < ApplicationController
         created_at: post.created_at,
         user: {
           id: post.user&.id,
-          username: post.user&.username,
-          is_guest: post.user&.is_guest?
+          username: post.user&.username
         },
         likes: post.likes.map(&:to_s),
         comments: post.comments.map { |comment|
           {
             id: comment.id,
             content: comment.content,
-            created_at: comment.created_at,
-            user: {
-              id: comment.user&.id,
-              username: comment.user&.username
-            }
+            created_at: comment.created_at
           }
         }
       }
@@ -46,11 +41,7 @@ class PostsController < ApplicationController
         {
           id: comment.id,
           content: comment.content,
-          created_at: comment.created_at,
-          user: {
-            id: comment.user&.id,
-            username: comment.user&.username
-          }
+          created_at: comment.created_at
         }
       }
     }
@@ -77,8 +68,7 @@ class PostsController < ApplicationController
         created_at: @post.created_at,
         user: {
           id: @post.user.id,
-          username: @post.user.username,
-          is_guest: @post.user.is_guest?
+          username: @post.user.username
         },
         likes: @post.likes.map(&:to_s),
         comments: []
@@ -148,11 +138,7 @@ class PostsController < ApplicationController
           {
             id: comment.id,
             content: comment.content,
-            created_at: comment.created_at,
-            user: {
-              id: comment.user&.id,
-              username: comment.user&.username
-            }
+            created_at: comment.created_at
           }
         }
       }
@@ -186,11 +172,7 @@ class PostsController < ApplicationController
           {
             id: comment.id,
             content: comment.content,
-            created_at: comment.created_at,
-            user: {
-              id: comment.user&.id,
-              username: comment.user&.username
-            }
+            created_at: comment.created_at
           }
         }
       }
@@ -223,11 +205,7 @@ class PostsController < ApplicationController
           {
             id: comment.id,
             content: comment.content,
-            created_at: comment.created_at,
-            user: {
-              id: comment.user&.id,
-              username: comment.user&.username
-            }
+            created_at: comment.created_at
           }
         }
       }

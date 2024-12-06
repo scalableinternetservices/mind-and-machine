@@ -3,7 +3,7 @@
 import { Comment } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
 import { enUS } from 'date-fns/locale';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { postService } from '@/services/post';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { UserCircleIcon } from '@heroicons/react/24/solid';
@@ -11,7 +11,6 @@ import { PencilIcon } from '@heroicons/react/24/outline';
 import { AxiosError } from 'axios';
 
 interface CommentListProps {
-  comments: Comment[];
   postId: number;
   onCommentAdded?: (newComment: Comment) => void;
   onCommentDeleted?: (commentId: number) => void;
@@ -20,13 +19,13 @@ interface CommentListProps {
 }
 
 const CommentList = ({
-  comments,
   postId,
   onCommentAdded,
   onCommentDeleted,
   onCommentUpdated,
   currentUserId,
 }: CommentListProps) => {
+  const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -34,6 +33,14 @@ const CommentList = ({
   const [editContent, setEditContent] = useState('');
 
   const isGuestPost = localStorage.getItem('username') === null;
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      const data = await postService.getPostComments(postId);
+      setComments(data);
+    };
+    fetchComments();
+}, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

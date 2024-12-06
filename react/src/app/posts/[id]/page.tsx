@@ -130,8 +130,7 @@ const PostDetailPage = () => {
             </div>
           </div>
         </div>
-        <CommentList 
-          comments={post.comments} 
+        <CommentList
           postId={post.id}
           onCommentAdded={handleCommentAdded}
           onCommentDeleted={handleCommentDeleted}
