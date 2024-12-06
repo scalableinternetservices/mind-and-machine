@@ -52,7 +52,7 @@ class PostsController < ApplicationController
   end
 
   def create
-    @post = if current_user
+    @post = if logged_in?
               current_user.posts.build(post_params)
             else
               guest_user = User.guest
