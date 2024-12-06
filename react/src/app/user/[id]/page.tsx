@@ -1,32 +1,33 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Layout from '@/components/layout/Layout';
 import { Post } from '@/types';
 import { postService } from '@/services/post';
-import { UserCircleIcon, CalendarIcon } from '@heroicons/react/24/outline';
+import { CalendarIcon } from '@heroicons/react/24/outline';
+import { UserCircleIcon } from '@heroicons/react/24/solid';
 import { formatDistanceToNow } from 'date-fns';
 import { enUS } from 'date-fns/locale';
-import PostList from '@/components/post/PostList';
-import { Tab } from '@headlessui/react';
-import clsx from 'clsx';
+import Layout from '@/components/layout/Layout';
+import PostCard from '@/components/post/PostCard';
 import { useParams } from 'next/navigation';
+
+type Tab = 'posts' | 'likes';
 
 const UserProfilePage = () => {
   const { id } = useParams();
-  const [userPosts, setUserPosts] = useState<Post[]>([]);
-  const [likedPosts, setLikedPosts] = useState<Post[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [currentUserId, setCurrentUserId] = useState<number| null>(null);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [joinedDate, setJoinedDate] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<Tab>('posts');
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const currentId = parseInt(localStorage.getItem('userId') || '0');
     setCurrentUserId(currentId);
-    const cuurentUserName = localStorage.getItem('username');
-    setUsername(cuurentUserName);
+    const currentUserName = localStorage.getItem('username');
+    setUsername(currentUserName);
     const joinedAt = localStorage.getItem('joined_at');
     setJoinedDate(joinedAt);
 
@@ -35,26 +36,28 @@ const UserProfilePage = () => {
     }
   }, [id]);
 
+  // listen to activeTab change
+  useEffect(() => {
+    if (id) {
+      fetchUserData(id as number);
+    }
+  }, [activeTab]);
+
   const fetchUserData = async (userId: number) => {
     setIsLoading(true);
+    setError(null);
     try {
-      const [posts, liked] = await Promise.all([
-        postService.getUserPosts(userId),
-        postService.getLikedPosts(userId)
-      ]);
+      const data = activeTab === 'posts'
+        ? await postService.getUserPosts(userId)
+        : await postService.getLikedPosts(userId);
       
-      const postsWithIntLikes = posts.map(post => ({
+      // make sure likes is an array of integers
+      const postsWithIntLikes = data.map((post: Post) => ({
         ...post,
         likes: post.likes.map(like => parseInt(like))
       }));
       
-      const likedWithIntLikes = liked.map(post => ({
-        ...post,
-        likes: post.likes.map(like => parseInt(like))
-      }));
-
-      setUserPosts(postsWithIntLikes);
-      setLikedPosts(likedWithIntLikes);
+      setPosts(postsWithIntLikes);
     } catch (err: any) {
       setError('Failed to fetch user data');
       console.error('Error fetching user data:', err);
@@ -62,27 +65,24 @@ const UserProfilePage = () => {
       setIsLoading(false);
     }
   };
+  const handleTabChange = (tab: Tab) => {
+    setActiveTab(tab);
+  };
 
   const handlePostUpdate = (updatedPost: Post) => {
-    setUserPosts(posts => posts.map(post => 
-      post.id === updatedPost.id ? updatedPost : post
-    ));
-    setLikedPosts(posts => posts.map(post => 
+    setPosts(posts.map((post: Post) =>
       post.id === updatedPost.id ? updatedPost : post
     ));
   };
 
   const handlePostDelete = (postId: number) => {
-    setUserPosts(posts => posts.filter(post => post.id !== postId));
-    setLikedPosts(posts => posts.filter(post => post.id !== postId));
+    setPosts(posts.filter((post: Post) => post.id !== postId));
   };
 
-  if (isLoading) {
+  if (error) {
     return (
       <Layout>
-        <div className="flex justify-center items-center h-screen">
-          <div className="text-white">Loading...</div>
-        </div>
+        <div className="text-red-500 p-4">{error}</div>
       </Layout>
     );
   }
@@ -99,9 +99,9 @@ const UserProfilePage = () => {
                 <div className="flex items-center text-gray-500 mt-2">
                   <CalendarIcon className="w-5 h-5 mr-2" />
                   <span>
-                    Joined {formatDistanceToNow(new Date(joinedDate), { 
-                      locale: enUS, 
-                      addSuffix: true 
+                    Joined {formatDistanceToNow(new Date(joinedDate), {
+                      locale: enUS,
+                      addSuffix: true
                     })}
                   </span>
                 </div>
@@ -110,47 +110,50 @@ const UserProfilePage = () => {
           </div>
         </div>
 
-        <Tab.Group>
-          <Tab.List className="flex border-b border-gray-800">
-            <Tab className={({ selected }) => clsx(
-              'flex-1 py-4 text-sm text-center focus:outline-none transition-all',
-              selected 
-                ? 'text-blue-500 border-b-2 border-blue-500 font-bold'
-                : 'text-gray-500 hover:text-gray-300 font-normal'
-            )}>
-              Posts
-            </Tab>
-            <Tab className={({ selected }) => clsx(
-              'flex-1 py-4 text-sm text-center focus:outline-none transition-all',
-              selected 
-                ? 'text-blue-500 border-b-2 border-blue-500 font-bold'
-                : 'text-gray-500 hover:text-gray-300 font-normal'
-            )}>
-              Likes
-            </Tab>
-          </Tab.List>
-          <Tab.Panels>
-            <Tab.Panel>
-              <PostList 
-                posts={userPosts} 
+        <div className="flex border-b border-gray-800">
+          <button
+            className={`flex-1 py-4 text-center hover:bg-gray-900 transition ${
+              activeTab === 'posts' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'
+            }`}
+            onClick={() => handleTabChange('posts')}
+          >
+            Posts
+          </button>
+          <button
+            className={`flex-1 py-4 text-center hover:bg-gray-900 transition ${
+              activeTab === 'likes' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'
+            }`}
+            onClick={() => handleTabChange('likes')}
+          >
+            Likes
+          </button>
+        </div>
+
+        {isLoading ? (
+          <div className="flex justify-center p-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500">Loading...</div>
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-800">
+            {posts.map((post) => (
+              <PostCard
+                key={post.id}
+                post={post}
                 currentUserId={currentUserId}
-                onPostUpdate={handlePostUpdate}
-                onPostDelete={handlePostDelete}
+                onUpdate={handlePostUpdate}
+                onDelete={handlePostDelete}
               />
-            </Tab.Panel>
-            <Tab.Panel>
-              <PostList 
-                posts={likedPosts}
-                currentUserId={currentUserId}
-                onPostUpdate={handlePostUpdate}
-                onPostDelete={handlePostDelete}
-              />
-            </Tab.Panel>
-          </Tab.Panels>
-        </Tab.Group>
+            ))}
+            {posts.length === 0 && (
+              <div className="text-gray-500 text-center py-8">
+                {activeTab === 'posts' ? 'No posts yet' : 'No liked posts yet'}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </Layout>
   );
-};
+} 
 
-export default UserProfilePage; 
+export default UserProfilePage;
