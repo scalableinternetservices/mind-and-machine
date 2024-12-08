@@ -78,6 +78,57 @@ class PostsController < ApplicationController
     end
   end
 
+  def create_1
+    guest_user = User.guest
+    @post = guest_user.posts.build(post_params)
+    @post.likes = []
+
+    if @post.save
+      render json: { message: "Post created successfully" }, status: :created
+    else
+      render json: { errors: @post.errors }, status: :unprocessable_entity
+    end
+  end
+
+  def create_2
+    @post = if logged_in?
+      current_user.posts.build(post_params)
+    else
+      guest_user = User.guest
+      guest_user.posts.build(post_params)
+    end
+
+    @post.likes = []
+
+    if @post.save
+      render json: { message: "Post created successfully" }, status: :created
+    else
+      render json: { errors: @post.errors }, status: :unprocessable_entity
+    end
+  end
+
+  def create_3
+    guest_user = User.guest
+    @post = guest_user.posts.build(post_params)
+    @post.likes = []
+
+    if @post.save
+      render json: {
+        id: @post.id,
+        content: @post.content,
+        created_at: @post.created_at,
+        user: {
+          id: @post.user.id,
+          username: @post.user.username
+        },
+        likes: @post.likes.map(&:to_s),
+        comments: []
+      }, status: :created
+    else
+      render json: { errors: @post.errors }, status: :unprocessable_entity
+    end
+  end
+
   def edit
   end
 
