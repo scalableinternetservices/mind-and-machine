@@ -79,14 +79,24 @@ class PostsController < ApplicationController
   end
 
   def create_1
-    guest_user = User.guest
-    @post = guest_user.posts.build(post_params)
-    @post.likes = []
-
-    if @post.save
-      render json: { message: "Post created successfully" }, status: :created
-    else
-      render json: { errors: @post.errors }, status: :unprocessable_entity
+    begin
+      Rails.logger.info "Attempting to find guest user"
+      guest_user = User.guest
+      
+      Rails.logger.info "Guest user found: #{guest_user.inspect}"
+      @post = guest_user.posts.build(post_params)
+      @post.likes = []
+  
+      if @post.save
+        Rails.logger.info "Post saved successfully"
+        render json: { message: "Post created successfully" }, status: :created
+      else
+        Rails.logger.error "Failed to save post: #{@post.errors.full_messages}"
+        render json: { errors: @post.errors }, status: :unprocessable_entity
+      end
+    rescue => e
+      Rails.logger.error "Error in create_1: #{e.message}\n#{e.backtrace.join("\n")}"
+      render json: { error: "An error occurred while creating the post" }, status: :internal_server_error
     end
   end
 
@@ -130,7 +140,11 @@ class PostsController < ApplicationController
   end
 
   def create_4
-    render json: { message: "Post created successfully" }, status: :created
+    if User.guest === nil
+      render json: { message: "Guest user not found" }, status: :not_found
+    else
+      render json: { message: "Guest user found" }, status: :ok
+    end
   end
 
   def edit
