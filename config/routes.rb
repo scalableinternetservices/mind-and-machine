@@ -18,6 +18,7 @@ Rails.application.routes.draw do
     post '/posts/create_1', to: 'posts#create_1'
     post '/posts/create_2', to: 'posts#create_2'
     post '/posts/create_3', to: 'posts#create_3'
+    post '/posts/create_4', to: 'posts#create_4'
     
     resources :posts do
       member do

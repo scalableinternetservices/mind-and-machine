@@ -129,6 +129,10 @@ class PostsController < ApplicationController
     end
   end
 
+  def create_4
+    render json: { message: "Post created successfully" }, status: :created
+  end
+
   def edit
   end
 
