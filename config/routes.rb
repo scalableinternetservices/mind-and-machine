@@ -13,12 +13,6 @@ Rails.application.routes.draw do
     get '/user/:user_id/posts', to: 'posts#user_posts'
     get '/user/:user_id/liked_posts', to: 'posts#liked_posts'
     get '/posts/:post_id/comments', to: 'comments#post_comments'
-
-    # post routes
-    post '/posts/create_1', to: 'posts#create_1'
-    post '/posts/create_2', to: 'posts#create_2'
-    post '/posts/create_3', to: 'posts#create_3'
-    post '/posts/create_4', to: 'posts#create_4'
     
     resources :posts do
       member do

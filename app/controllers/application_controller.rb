@@ -16,4 +16,24 @@ class ApplicationController < ActionController::Base
       render json: { error: "login required" }, status: :unauthorized
     end
   end
+
+  def ensure_guest_user
+    return User.guest if User.guest.present?
+
+    # Create guest user if it doesn't exist
+    guest = User.new(
+      username: '[Guest]',
+      password: SecureRandom.hex(32),
+      is_guest: true
+    )
+
+    if guest.save
+      Rails.logger.info "Guest user created successfully"
+      guest
+    else
+      Rails.logger.error "Failed to create guest user: #{guest.errors.full_messages.join(', ')}"
+      nil
+    end
+  end
+
 end
