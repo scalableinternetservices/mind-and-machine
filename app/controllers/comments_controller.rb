@@ -8,8 +8,13 @@ class CommentsController < ApplicationController
     @comment = if current_user
                 @post.comments.build(comment_params.merge(user: current_user))
               else
-                guest_user = User.guest
-                @post.comments.build(comment_params.merge(user: guest_user))
+                guest_user = ensure_guest_user
+                if guest_user
+                  @post.comments.build(comment_params.merge(user: guest_user))
+                else
+                  render json: { error: "Failed to create guest user" }, status: :internal_server_error
+                  return
+                end
               end
 
     if @comment.save
