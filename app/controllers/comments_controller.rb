@@ -37,17 +37,21 @@ class CommentsController < ApplicationController
     @comments = Comment.all
                        .where(post_id: params[:post_id])
                        .order(created_at: :desc)
-    render json: @comments.map { |comment|
-      {
-        id: comment.id,
-        content: comment.content,
-        created_at: comment.created_at,
-        user: {
-          id: comment.user.id,
-          username: comment.user.username
+
+    # use stale? to conditionally render
+    if stale?(etag: @comments, last_modified: @comments.maximum(:updated_at), public: true)
+      render json: @comments.map { |comment|
+        {
+          id: comment.id,
+          content: comment.content,
+          created_at: comment.created_at,
+          user: {
+            id: comment.user.id,
+            username: comment.user.username
+          }
         }
       }
-    }
+    end
   end
 
   def update

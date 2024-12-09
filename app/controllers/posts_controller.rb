@@ -5,25 +5,29 @@ class PostsController < ApplicationController
   
   def index
     @posts = Post.all.order(created_at: :desc)
-    render json: @posts.map { |post| 
-      {
-        id: post.id,
-        content: post.content,
-        created_at: post.created_at,
-        user: {
-          id: post.user&.id,
-          username: post.user&.username
-        },
-        likes: post.likes.map(&:to_s),
-        comments: post.comments.map { |comment|
+
+    # use stale? to conditionally render
+    if stale?(etag: @posts, last_modified: @posts.maximum(:updated_at), public: true)
+        render json: @posts.map { |post|
           {
-            id: comment.id,
-            content: comment.content,
-            created_at: comment.created_at
+          id: post.id,
+          content: post.content,
+          created_at: post.created_at,
+          user: {
+            id: post.user&.id,
+            username: post.user&.username
+          },
+          likes: post.likes.map(&:to_s),
+          comments: post.comments.map { |comment|
+            {
+              id: comment.id,
+              content: comment.content,
+              created_at: comment.created_at
+            }
           }
         }
       }
-    }
+    end
   end
 
   def show
