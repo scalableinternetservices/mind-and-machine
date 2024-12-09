@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Post } from '@/types';
+import { Post, Comment } from '@/types';
 import { useParams, useRouter } from 'next/navigation';
 import Layout from '@/components/layout/Layout';
 import { formatDistanceToNow } from 'date-fns';
@@ -11,7 +11,6 @@ import Link from 'next/link';
 import CommentList from '@/components/comment/CommentList';
 import { UserCircleIcon } from '@heroicons/react/24/solid';
 import { postService } from '@/services/post';
-import { authService } from '@/services/auth';
 
 const PostDetailPage = () => {
   const { id } = useParams();
@@ -23,7 +22,7 @@ const PostDetailPage = () => {
 
   const fetchPost = async () => {
     try {
-      const data = await postService.getPost(id as string);
+      const data = await postService.getPost(parseInt(id));
       setPost(data);
     } catch (err: any) {
       if (err.response?.status === 401) {
@@ -47,35 +46,6 @@ const PostDetailPage = () => {
     const userId = parseInt(localStorage.getItem('userId') || '0');
     setCurrentUserId(userId);
   }, []);
-
-  const handleCommentAdded = (newComment: Comment) => {
-    if (post) {
-      setPost({
-        ...post,
-        comments: [...post.comments, newComment]
-      });
-    }
-  };
-
-  const handleCommentDeleted = (commentId: number) => {
-    if (post) {
-      setPost({
-        ...post,
-        comments: post.comments.filter(comment => comment.id !== commentId)
-      });
-    }
-  };
-
-  const handleCommentUpdated = (updatedComment: Comment) => {
-    if (post) {
-      setPost({
-        ...post,
-        comments: post.comments.map(comment =>
-          comment.id === updatedComment.id ? updatedComment : comment
-        )
-      });
-    }
-  };
 
   if (isLoading) {
     return (
@@ -132,9 +102,6 @@ const PostDetailPage = () => {
         </div>
         <CommentList
           postId={post.id}
-          onCommentAdded={handleCommentAdded}
-          onCommentDeleted={handleCommentDeleted}
-          onCommentUpdated={handleCommentUpdated}
           currentUserId={currentUserId}
         />
       </div>

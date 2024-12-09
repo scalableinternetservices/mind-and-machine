@@ -45,7 +45,6 @@ const HomePage = () => {
 
     try {
       const createdPost = await postService.createPost(newPost);
-      console.log('Created post:', createdPost);
       setPosts([createdPost, ...posts]); // set new post to the first of the list
       setNewPost('');
     } catch (err: unknown) {
