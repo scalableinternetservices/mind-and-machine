@@ -52,11 +52,17 @@ class PostsController < ApplicationController
   end
 
   def create
-    @post = if logged_in?
+    @post = if current_user
               current_user.posts.build(post_params)
             else
-              guest_user = User.guest
-              guest_user.posts.build(post_params)
+              # Get or create guest user
+              guest_user = ensure_guest_user
+              if guest_user
+                guest_user.posts.build(post_params)
+              else
+                render json: { error: "Failed to create guest user" }, status: :internal_server_error
+                return
+              end
             end
 
     @post.likes = []
@@ -68,7 +74,8 @@ class PostsController < ApplicationController
         created_at: @post.created_at,
         user: {
           id: @post.user.id,
-          username: @post.user.username
+          username: @post.user.username,
+          is_guest: @post.user.is_guest?
         },
         likes: @post.likes.map(&:to_s),
         comments: []
@@ -76,78 +83,6 @@ class PostsController < ApplicationController
     else
       render json: { errors: @post.errors }, status: :unprocessable_entity
     end
-  end
-
-  def create_1
-    begin
-      Rails.logger.info "Attempting to find guest user"
-      guest_user = User.guest
-      
-      Rails.logger.info "Guest user found: #{guest_user.inspect}"
-      @post = guest_user.posts.build(post_params)
-      @post.likes = []
-  
-      if @post.save
-        Rails.logger.info "Post saved successfully"
-        render json: { message: "Post created successfully" }, status: :created
-      else
-        Rails.logger.error "Failed to save post: #{@post.errors.full_messages}"
-        render json: { errors: @post.errors }, status: :unprocessable_entity
-      end
-    rescue => e
-      Rails.logger.error "Error in create_1: #{e.message}\n#{e.backtrace.join("\n")}"
-      render json: { error: "An error occurred while creating the post" }, status: :internal_server_error
-    end
-  end
-
-  def create_2
-    @post = if logged_in?
-      current_user.posts.build(post_params)
-    else
-      guest_user = User.guest
-      guest_user.posts.build(post_params)
-    end
-
-    @post.likes = []
-
-    if @post.save
-      render json: { message: "Post created successfully" }, status: :created
-    else
-      render json: { errors: @post.errors }, status: :unprocessable_entity
-    end
-  end
-
-  def create_3
-    guest_user = User.guest
-    @post = guest_user.posts.build(post_params)
-    @post.likes = []
-
-    if @post.save
-      render json: {
-        id: @post.id,
-        content: @post.content,
-        created_at: @post.created_at,
-        user: {
-          id: @post.user.id,
-          username: @post.user.username
-        },
-        likes: @post.likes.map(&:to_s),
-        comments: []
-      }, status: :created
-    else
-      render json: { errors: @post.errors }, status: :unprocessable_entity
-    end
-  end
-
-  def create_4
-    if User.guest === nil
-      render json: { message: "Guest user not found" }, status: :not_found
-    else
-      render json: { message: "Guest user found" }, status: :ok
-    end
-  end
-
-  def edit
   end
 
   def update
@@ -297,6 +232,25 @@ class PostsController < ApplicationController
   def check_ownership
     unless @post.user == current_user
       render json: { error: "You can only modify your own posts" }, status: :forbidden
+    end
+  end
+
+  def ensure_guest_user
+    return User.guest if User.guest.present?
+    
+    # Create guest user if it doesn't exist
+    guest = User.new(
+      username: '[Guest]',
+      password: SecureRandom.hex(32),
+      is_guest: true
+    )
+    
+    if guest.save
+      Rails.logger.info "Guest user created successfully"
+      guest
+    else
+      Rails.logger.error "Failed to create guest user: #{guest.errors.full_messages.join(', ')}"
+      nil
     end
   end
 end
