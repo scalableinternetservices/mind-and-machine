@@ -34,20 +34,27 @@ class CommentsController < ApplicationController
   end
 
   def post_comments
-    @comments = Comment.all
-                       .where(post_id: params[:post_id])
-                       .order(created_at: :desc)
-    render json: @comments.map { |comment|
-      {
-        id: comment.id,
-        content: comment.content,
-        created_at: comment.created_at,
-        user: {
-          id: comment.user.id,
-          username: comment.user.username
+    # cache key for low level cache
+    cache_key = "post/#{params[:post_id]}/comments-#{Comment.where(post_id: params[:post_id]).maximum(:updated_at)}"
+    
+    comments_data = Rails.cache.fetch(cache_key, expires_in: 5.minutes) do
+      Rails.logger.info "Generating fresh comments data..."
+      Comment.where(post_id: params[:post_id])
+             .order(created_at: :desc)
+             .map { |comment|
+        {
+          id: comment.id,
+          content: comment.content,
+          created_at: comment.created_at,
+          user: {
+            id: comment.user.id,
+            username: comment.user.username
+          }
         }
       }
-    }
+    end
+
+    render json: comments_data
   end
 
   def update

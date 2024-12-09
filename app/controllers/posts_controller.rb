@@ -4,26 +4,33 @@ class PostsController < ApplicationController
   before_action :check_ownership, only: [:update, :destroy]
   
   def index
-    @posts = Post.all.order(created_at: :desc)
-    render json: @posts.map { |post| 
-      {
-        id: post.id,
-        content: post.content,
-        created_at: post.created_at,
-        user: {
-          id: post.user&.id,
-          username: post.user&.username
-        },
-        likes: post.likes.map(&:to_s),
-        comments: post.comments.map { |comment|
-          {
-            id: comment.id,
-            content: comment.content,
-            created_at: comment.created_at
+    # cache key for low level cache
+    cache_key = "posts/all-#{Post.maximum(:updated_at)}-#{Post.count}"
+    
+    posts_data = Rails.cache.fetch(cache_key, expires_in: 5.minutes) do
+      Rails.logger.info "Generating fresh data..."
+      Post.all.order(created_at: :desc).map { |post| 
+        {
+          id: post.id,
+          content: post.content,
+          created_at: post.created_at,
+          user: {
+            id: post.user&.id,
+            username: post.user&.username
+          },
+          likes: post.likes.map(&:to_s),
+          comments: post.comments.map { |comment|
+            {
+              id: comment.id,
+              content: comment.content,
+              created_at: comment.created_at
+            }
           }
         }
       }
-    }
+    end
+
+    render json: posts_data
   end
 
   def show
