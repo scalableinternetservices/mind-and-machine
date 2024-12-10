@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!DOCTYPE tsung SYSTEM "/usr/local/share/tsung/tsung-1.0.dtd" [] >
+<tsung loglevel="debug">
+  <clients>
+    <client host="localhost" maxusers="32768" use_controller_vm="true" />
+  </clients>
+
+  <servers>
+    <server host="ziqiTest.eba-wqi6mj7g.us-west-2.elasticbeanstalk.com" port="80" type="tcp" />
+  </servers>
+
+  <load>
+    <!-- Phase 1 -->
+    <arrivalphase phase="1" duration="20" unit="second">
+      <users arrivalrate="1" unit="second"></users>
+    </arrivalphase>
+    <!-- Phase 2 -->
+  </load>
+
+  <options>
+    <!-- Set connection timeout to 2 seconds -->
+    <option name="global_ack_timeout" value="2000"></option>
+  </options>
+
+  <sessions>
+    <session name="register-login-logout" type="ts_http" weight="1">
+      <setdynvars sourcetype="random_string" length="13">
+        <var name="rand_str1" />
+      </setdynvars>
+      
+      <request>
+        <!-- <dyn_variable name="post_id" jsonpath="$.id"/> -->
+        <http url="/api/posts" method="POST" version="1.1" contents="content=random_content">
+        <http_header name="Content-Type" value="application/json"/>
+        <http_header name="Accept" value="application/json"/>
+        </http>
+      </request>
+      <thinktime value="2" random="true"></thinktime>
+
+      <request>
+        <http url="/api/posts/%%_post_id%%/comments" method="POST" version="1.1"  contents="postId=%%_post_id%%;content=unauth_%%_rand_str1%%">
+        <http_header name="Content-Type" value="application/json"/>
+        <http_header name="Accept" value="application/json"/>
+        </http>
+      </request>
+      
+    </session>
+  </sessions>
+</tsung>
