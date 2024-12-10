@@ -1,4 +1,5 @@
 class UsersController < ApplicationController
+  skip_forgery_protection
   before_action :require_login, only: [:potential_chat_members]
 
   def index

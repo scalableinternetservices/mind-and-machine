@@ -1,4 +1,5 @@
 class ChatMessagesController < ApplicationController
+  skip_forgery_protection
   before_action :require_login
   before_action :set_chat_room
   before_action :check_membership

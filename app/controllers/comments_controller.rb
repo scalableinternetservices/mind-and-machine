@@ -1,4 +1,5 @@
 class CommentsController < ApplicationController
+  skip_forgery_protection
   before_action :require_login, only: [:update, :destroy]
   before_action :set_post
   before_action :set_comment, only: [:update, :destroy]
