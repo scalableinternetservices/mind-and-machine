@@ -1,5 +1,4 @@
 class PostsController < ApplicationController
-  skip_forgery_protection
   before_action :require_login, only: [:update, :destroy, :like, :unlike]
   before_action :set_post, only: [:show, :update, :destroy, :like, :unlike]
   before_action :check_ownership, only: [:update, :destroy]
