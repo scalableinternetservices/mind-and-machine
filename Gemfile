@@ -8,7 +8,7 @@ gem "bcrypt", "~> 3.1.7"
 
 gem "jwt"
 
-gem "rails", "~> 7.1.2"
+gem "rails", "~> 8.0.0"
 
 gem "sprockets-rails"
 
