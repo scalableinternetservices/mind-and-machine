@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE tsung SYSTEM "/usr/local/share/tsung/tsung-1.0.dtd" [] >
-<tsung loglevel="debug">
+<tsung loglevel="notice">
   <clients>
     <client host="localhost" maxusers="32768" use_controller_vm="true" />
   </clients>
@@ -13,6 +13,25 @@
     <!-- Phase 1 -->
     <arrivalphase phase="1" duration="20" unit="second">
       <users arrivalrate="1" unit="second"></users>
+    </arrivalphase>
+    <!-- Phase 2 -->
+    <arrivalphase phase="2" duration="20" unit="second">
+      <users arrivalrate="4" unit="second"></users>
+    </arrivalphase>
+    <!-- Phase 3 -->
+    <arrivalphase phase="3" duration="20" unit="second">
+      <users arrivalrate="8" unit="second"></users>
+    </arrivalphase>
+    <!-- Phase 4 -->
+    <arrivalphase phase="4" duration="60" unit="second">
+      <users arrivalrate="16" unit="second"></users>
+    </arrivalphase>
+    <!-- Phase 5 -->
+    <arrivalphase phase="5" duration="60" unit="second">
+      <users arrivalrate="64" unit="second"></users>
+    </arrivalphase>
+    <arrivalphase phase="6" duration="60" unit="second">
+      <users arrivalrate="128" unit="second"></users>
     </arrivalphase>
   </load>
 
@@ -104,4 +123,3 @@
     </session>
   </sessions>
 </tsung>
-
