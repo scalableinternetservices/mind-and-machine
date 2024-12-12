@@ -4,7 +4,7 @@ class ChatMessagesController < ApplicationController
   before_action :check_membership
   
   def index
-    @messages = @chat_room.chat_messages.all.order(created_at: :desc)
+    @messages = @chat_room.chat_messages.includes(:user).order(created_at: :desc)
     
     render json: @messages.map { |message|
       {
