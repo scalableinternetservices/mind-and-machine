@@ -11,27 +11,30 @@
 
   <load>
     <!-- Phase 1 -->
-    <arrivalphase phase="1" duration="20" unit="second">
+    <arrivalphase phase="1" duration="60" unit="second">
       <users arrivalrate="1" unit="second"></users>
     </arrivalphase>
     <!-- Phase 2 -->
-    <arrivalphase phase="2" duration="20" unit="second">
-      <users arrivalrate="4" unit="second"></users>
+    <arrivalphase phase="2" duration="60" unit="second">
+      <users arrivalrate="2" unit="second"></users>
     </arrivalphase>
     <!-- Phase 3 -->
-    <arrivalphase phase="3" duration="20" unit="second">
-      <users arrivalrate="8" unit="second"></users>
+    <arrivalphase phase="3" duration="60" unit="second">
+      <users arrivalrate="4" unit="second"></users>
     </arrivalphase>
     <!-- Phase 4 -->
     <arrivalphase phase="4" duration="60" unit="second">
-      <users arrivalrate="16" unit="second"></users>
+      <users arrivalrate="8" unit="second"></users>
     </arrivalphase>
     <!-- Phase 5 -->
     <arrivalphase phase="5" duration="60" unit="second">
-      <users arrivalrate="64" unit="second"></users>
+      <users arrivalrate="16" unit="second"></users>
     </arrivalphase>
     <arrivalphase phase="6" duration="60" unit="second">
-      <users arrivalrate="128" unit="second"></users>
+      <users arrivalrate="32" unit="second"></users>
+    </arrivalphase>
+    <arrivalphase phase="7" duration="60" unit="second">
+      <users arrivalrate="64" unit="second"></users>
     </arrivalphase>
   </load>
 
@@ -47,6 +50,14 @@
       </setdynvars>
 
       <!-- this one success -->
+
+      <request>
+        <dyn_variable name="content" jsonpath="$.content"/>
+        <http url="/api/posts" method="GET" version="1.1">
+        <http_header name="Content-Type" value="application/json"/>
+        <http_header name="Accept" value="application/json"/>
+        </http>
+      </request>
       
       <request subst="true">
         <dyn_variable name="post_id" jsonpath="$.id"/>
@@ -55,7 +66,6 @@
         <http_header name="Accept" value="application/json"/>
         </http>
       </request>
-      <thinktime value="2" random="true"></thinktime>
 
       <request>
         <dyn_variable name="content" jsonpath="$.content"/>
@@ -67,14 +77,6 @@
 
       <thinktime value="2" random="true"></thinktime>
 
-      <!-- <request subst="true">
-        <dyn_variable name="comment_id" jsonpath="$.id"/>
-        <http url="/api/posts/%%_post_id%%/comments" method="POST" version="1.1"  contents='{&quot;postId&quot;: &quot;%%_post_id%%&quot;; &quot;content&quot;: &quot;%%_rand_str1%%&quot;}'>
-        <http_header name="Content-Type" value="application/json"/>
-        <http_header name="Accept" value="application/json"/>
-        </http>
-      </request> -->
-
       <request subst="true">
         <dyn_variable name="comment_id" jsonpath="$.id"/>
         <http url="/api/posts/%%_post_id%%/comments" method="POST" version="1.1"  contents='postId=%%_post_id%%&amp;content=%%_rand_str1%%'>
@@ -82,6 +84,15 @@
         <http_header name="Accept" value="application/x-www-form-urlencoded"/>
         </http>
       </request>
+
+      <request>
+        <dyn_variable name="comment_id" jsonpath="$.id"/>
+        <http url="/api/posts/%%_post_id%%/comments" method="GET" version="1.1">
+        <http_header name="Content-Type" value="application/x-www-form-urlencoded"/>
+        <http_header name="Accept" value="application/x-www-form-urlencoded"/>
+        </http>
+      </request>
+      
       
     </session>
   </sessions>
