@@ -12,17 +12,11 @@ import { AxiosError } from 'axios';
 
 interface CommentListProps {
   postId: number;
-  onCommentAdded?: (newComment: Comment) => void;
-  onCommentDeleted?: (commentId: number) => void;
-  onCommentUpdated?: (updatedComment: Comment) => void;
   currentUserId?: number | null;
 }
 
 const CommentList = ({
   postId,
-  onCommentAdded,
-  onCommentDeleted,
-  onCommentUpdated,
   currentUserId,
 }: CommentListProps) => {
   const [comments, setComments] = useState<Comment[]>([]);
@@ -40,7 +34,21 @@ const CommentList = ({
       setComments(data);
     };
     fetchComments();
-}, []);
+  }, []);
+
+  const onCommentAdded = (newComment: Comment) => {
+    setComments([newComment, ...comments]);
+  };
+
+  const onCommentDeleted = (commentId: number) => {
+    setComments(comments.filter(comment => comment.id !== commentId));
+  };
+
+  const onCommentUpdated = (updatedComment: Comment) => {
+    setComments(comments.map(comment =>
+      comment.id === updatedComment.id ? updatedComment : comment
+    ));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +59,8 @@ const CommentList = ({
 
     try {
       const comment = await postService.createComment(postId, newComment);
-      onCommentAdded?.(comment);
+      console.log('comment', comment);
+      onCommentAdded(comment);
       setNewComment('');
     } catch (err: unknown) {
       if (err instanceof AxiosError) {
@@ -70,7 +79,7 @@ const CommentList = ({
   const handleDelete = async (commentId: number) => {
     try {
       await postService.deleteComment(postId, commentId);
-      onCommentDeleted?.(commentId);
+      onCommentDeleted(commentId);
     } catch (err: unknown) {
       if (err instanceof AxiosError) {
         if (err.response?.status === 401) {
@@ -91,7 +100,7 @@ const CommentList = ({
 
     try {
       const updatedComment = await postService.updateComment(postId, commentId, editContent);
-      onCommentUpdated?.(updatedComment);
+      onCommentUpdated(updatedComment);
       setEditingCommentId(null);
     } catch (err: unknown) {
       if (err instanceof AxiosError) {
