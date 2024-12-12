@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<!DOCTYPE tsung SYSTEM "/usr/local/share/tsung/tsung-1.0.dtd" [] >
+<tsung loglevel="notice">
+  <clients>
+    <client host="localhost" maxusers="32768" use_controller_vm="true" />
+  </clients>
+
+  <servers>
+    <server host="ziqiTest2.eba-wqi6mj7g.us-west-2.elasticbeanstalk.com" port="80" type="tcp" />
+  </servers>
+
+  <load>
+    <!-- Phase 1 -->
+    <arrivalphase phase="1" duration="20" unit="second">
+      <users arrivalrate="1" unit="second"></users>
+    </arrivalphase>
+    <!-- Phase 2 -->
+    <arrivalphase phase="2" duration="20" unit="second">
+      <users arrivalrate="4" unit="second"></users>
+    </arrivalphase>
+    <!-- Phase 3 -->
+    <arrivalphase phase="3" duration="20" unit="second">
+      <users arrivalrate="8" unit="second"></users>
+    </arrivalphase>
+    <!-- Phase 4 -->
+    <arrivalphase phase="4" duration="60" unit="second">
+      <users arrivalrate="16" unit="second"></users>
+    </arrivalphase>
+    <!-- Phase 5 -->
+    <arrivalphase phase="5" duration="60" unit="second">
+      <users arrivalrate="64" unit="second"></users>
+    </arrivalphase>
+    <arrivalphase phase="6" duration="60" unit="second">
+      <users arrivalrate="128" unit="second"></users>
+    </arrivalphase>
+  </load>
+
+  <options>
+    <!-- Set connection timeout to 2 seconds -->
+    <option name="global_ack_timeout" value="2000"></option>
+  </options>
+
+  <sessions>
+    <session name="register-login-logout" type="ts_http" weight="1">
+      <setdynvars sourcetype="random_string" length="20">
+        <var name="rand_str1" />
+      </setdynvars>
+
+      <request subst="true">
+        <dyn_variable name="user_id" jsonpath="$.user.id"/>
+        <http url="/api/signup" method="POST" version="1.1" contents="username=user_%%_rand_str1%%&amp;password=w12345678&amp;password_confirmation=w12345678">
+        <http_header name="Content-Type" value="application/x-www-form-urlencoded"/>
+        <http_header name="Accept" value="application/x-www-form-urlencoded"/>
+        </http>
+      </request>
+      <thinktime value="2" random="true"></thinktime>
+      
+      <request subst="true">
+        <dyn_variable name="user_id_debug" jsonpath="$.user.id"/>
+        <http url="/api/login" method="POST" version="1.1" contents="username=user_%%_rand_str1%%&amp;password=w12345678">
+        <http_header name="Content-Type" value="application/x-www-form-urlencoded"/>
+        <http_header name="Accept" value="application/x-www-form-urlencoded"/>
+        </http>
+      </request>
+      <thinktime value="2" random="true"></thinktime>
+
+
+      <setdynvars sourcetype="random_string" length="10">
+        <var name="rand_str_message" />
+      </setdynvars>
+
+      <setdynvars sourcetype="random_string" length="5">
+        <var name="rand_str_group" />
+      </setdynvars>
+
+      <setdynvars sourcetype="random_number" start="1" end="3">
+        <var name="rnd_user1" />
+      </setdynvars>
+
+      <setdynvars sourcetype="random_number" start="3" end="6">
+        <var name="rnd_user2" />
+      </setdynvars>
+
+      <setdynvars sourcetype="random_number" start="6" end="9">
+        <var name="rnd_user3" />
+      </setdynvars>
+      
+      <request subst="true">
+        <dyn_variable name="chat_id" jsonpath="$.id"/>
+        <http url="/api/chats" method="POST" version="1.1" contents="member_ids=[%%_rnd_user1%%,%%_rnd_user2%%,%%_rnd_user3%%]&amp;name=chat_%%_rand_str_group%%">
+        <http_header name="Content-Type" value="application/x-www-form-urlencoded"/>
+        <http_header name="Accept" value="application/x-www-form-urlencoded"/>
+        </http>
+      </request>
+      <thinktime value="2" random="true"></thinktime>
+
+      <setdynvars sourcetype="random_string" length="15">
+        <var name="rand_str2" />
+      </setdynvars>
+
+      <request subst="true">
+        <http url="/api/chats/%%_chat_id%%/messages" method="POST" version="1.1" contents="chatId=%%_chat_id%%&amp;content=%%_rand_str_message%%">
+        <http_header name="Content-Type" value="application/x-www-form-urlencoded"/>
+        <http_header name="Accept" value="application/x-www-form-urlencoded"/>
+        </http>
+      </request>
+      <thinktime value="2" random="true"></thinktime>
+
+
+      <request subst="true">
+        <http url="/api/chats/%%_chat_id%%/messages" method="GET" version="1.1">
+        <http_header name="Content-Type" value="application/json"/>
+        <http_header name="Accept" value="application/json"/>
+        </http>
+      </request>
+      <thinktime value="2" random="true"></thinktime>
+
+
+      <request subst="true">
+        <http url="/api/logout" method="DELETE" version="1.1" contents="user_id=%%_user_id%%">
+        <http_header name="Content-Type" value="application/x-www-form-urlencoded"/>
+        <http_header name="Accept" value="application/x-www-form-urlencoded"/>
+        </http>
+      </request>
+    </session>
+  </sessions>
+</tsung>
