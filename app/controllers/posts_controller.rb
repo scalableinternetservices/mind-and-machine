@@ -14,7 +14,7 @@ class PostsController < ApplicationController
     # Limit per_page to 50
     per_page = [per_page, 50].min
     
-    @posts = Post.Post.includes(:user, :comments)
+    @posts = Post.includes(:user, :comments)
                  .order(created_at: :desc)
                  .offset((page - 1) * per_page)
                  .limit(per_page)
