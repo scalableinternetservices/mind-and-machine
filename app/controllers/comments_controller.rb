@@ -34,18 +34,42 @@ class CommentsController < ApplicationController
   end
 
   def post_comments
+    '''
+    GET /api/posts/:post_id/comments?page=1&per_page=10
+    GET /api/posts/:post_id/comments?page=2&per_page=20
+    '''
+    page = (params[:page] || 1).to_i
+    per_page = (params[:per_page] || 10).to_i
+    
+    # Limit per_page to 50
+    per_page = [per_page, 50].min
+
     @comments = Comment.includes(:user)
                        .where(post_id: params[:post_id])
                        .order(created_at: :desc)
-    render json: @comments.map { |comment|
-      {
-        id: comment.id,
-        content: comment.content,
-        created_at: comment.created_at,
-        user: {
-          id: comment.user.id,
-          username: comment.user.username
+                       .offset((page - 1) * per_page)
+                       .limit(per_page)
+    
+    total_comments = Comment.where(post_id: params[:post_id]).count
+    total_pages = (total_comments.to_f / per_page).ceil
+    
+    render json: {
+      comments: @comments.map { |comment|
+        {
+          id: comment.id,
+          content: comment.content,
+          created_at: comment.created_at,
+          user: {
+            id: comment.user.id,
+            username: comment.user.username
+          }
         }
+      },
+      meta: {
+        current_page: page,
+        per_page: per_page,
+        total_pages: total_pages,
+        total_comments: total_comments
       }
     }
   end

@@ -4,24 +4,55 @@ class PostsController < ApplicationController
   before_action :check_ownership, only: [:update, :destroy]
   
   def index
-    @posts = Post.includes(:user, :comments).order(created_at: :desc)
-    render json: @posts.map { |post| 
-      {
-        id: post.id,
-        content: post.content,
-        created_at: post.created_at,
-        user: {
-          id: post.user&.id,
-          username: post.user&.username
-        },
-        likes: post.likes.map(&:to_s),
-        comments: post.comments.map { |comment|
-          {
-            id: comment.id,
-            content: comment.content,
-            created_at: comment.created_at
+    '''
+    GET /api/posts?page=1&per_page=10
+    GET /api/posts?page=2&per_page=20
+    '''
+    page = (params[:page] || 1).to_i
+    per_page = (params[:per_page] || 10).to_i
+    
+    # Limit per_page to 50
+    per_page = [per_page, 50].min
+    
+    @posts = Post.Post.includes(:user, :comments)
+                 .order(created_at: :desc)
+                 .offset((page - 1) * per_page)
+                 .limit(per_page)
+    
+    total_posts = Post.count
+    total_pages = (total_posts.to_f / per_page).ceil
+    
+    render json: {
+      posts: @posts.map { |post|
+        {
+          id: post.id,
+          content: post.content,
+          created_at: post.created_at,
+          user: {
+            id: post.user.id,
+            username: post.user.username,
+            is_guest: post.user.is_guest?
+          },
+          likes: post.likes.map(&:to_s),
+          comments: post.comments.map { |comment|
+            {
+              id: comment.id,
+              content: comment.content,
+              created_at: comment.created_at,
+              user: {
+                id: comment.user.id,
+                username: comment.user.username,
+                is_guest: comment.user.is_guest?
+              }
+            }
           }
         }
+      },
+      meta: {
+        current_page: page,
+        per_page: per_page,
+        total_pages: total_pages,
+        total_posts: total_posts
       }
     }
   end
