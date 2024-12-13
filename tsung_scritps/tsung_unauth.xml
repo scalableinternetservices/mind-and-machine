@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE tsung SYSTEM "/usr/local/share/tsung/tsung-1.0.dtd" [] >
-<tsung loglevel="notice">
+<tsung loglevel="debug">
   <clients>
     <client host="localhost" maxusers="32768" use_controller_vm="true" />
   </clients>
@@ -67,7 +67,7 @@
         </http>
       </request>
 
-      <request>
+      <request subst="true">
         <dyn_variable name="content" jsonpath="$.content"/>
         <http url="/api/posts/%%_post_id%%" method="GET" version="1.1">
         <http_header name="Content-Type" value="application/json"/>
@@ -85,7 +85,7 @@
         </http>
       </request>
 
-      <request>
+      <request subst="true">
         <dyn_variable name="comment_id" jsonpath="$.id"/>
         <http url="/api/posts/%%_post_id%%/comments" method="GET" version="1.1">
         <http_header name="Content-Type" value="application/x-www-form-urlencoded"/>
