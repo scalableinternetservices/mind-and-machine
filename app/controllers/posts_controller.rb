@@ -9,7 +9,7 @@ class PostsController < ApplicationController
     
     posts_data = Rails.cache.fetch(cache_key, expires_in: 5.minutes) do
       Rails.logger.info "Generating fresh data..."
-      Post.all.order(created_at: :desc).map { |post| 
+      Post.includes(:user, :comments).order(created_at: :desc).map { |post| 
         {
           id: post.id,
           content: post.content,
