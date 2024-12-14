@@ -34,7 +34,7 @@ class CommentsController < ApplicationController
   end
 
   def post_comments
-    @comments = Comment.all
+    @comments = Comment.includes(:user)
                        .where(post_id: params[:post_id])
                        .order(created_at: :desc)
 
